@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>VueJS</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <section id="app" class="section">
+
+        <!-- Navigation -->
+        <nav class="navbar is-dark is-fixed-top" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="/">
+                    Liked Videos
+                    <!-- <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28"> -->
+                </a>
+
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                    data-target="navbarBasicExample">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+
+            <div id="navbarBasicExample" class="navbar-menu">
+
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="buttons">
+                            <button class="button is-info js-modal-trigger" data-target="modal-js-new-video">
+                                <strong>New</strong>
+                            </button>
+                            <!-- <a class="button is-primary">
+                                <strong>Sign up</strong>
+                            </a>
+                            <a class="button is-light">
+                                Log in
+                            </a> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Items Section -->
+        <section class="hero is-light is-bold is-fullheight mt-5">
+            <div class="hero-body">
+                <div class="container">
+                    <!-- <h1 class="title">
+                        Videos
+                    </h1>
+                    <h2 class="subtitle">
+                        Items
+                    </h2> -->
+
+                    <!-- Filters -->
+                    <div class="columns">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="columns">
+                                    <div class="column is-11">
+                                        <label class="checkbox" v-for="tg of allTags" style="margin-right: 7px;">
+                                            <input type="checkbox" :value="tg" v-model="selectedTags">
+                                            {{ tg }}
+                                            <br>
+                                        </label>
+                                    </div>
+                                    <div class="column">
+                                        <button class="button is-primary" v-on:click="getItemsByCurrentPage()">Filter</button>
+                                        <button class="button is-info is-light is-small mt-2" v-on:click="cleanTags()"
+                                            style="width: 78%;">Clean</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="columns is-multiline">
+                        <div class="card column is-3" v-for="item in items" style="width: 24% !important; margin: 5px;">
+                            <div class="card-image">
+                                <figure class="image is-4by3">
+                                    <a :href="item.url" target="_blank">
+                                        <img src="https://bulma.io/images/placeholders/1280x960.png"
+                                            alt="Placeholder image" v-if="!item.photo || 1 == 1">
+                                        <!-- <img :src="item.photo" v-if="item.photo"> -->
+                                    </a>
+                                </figure>
+                            </div>
+                            <div class="card-content">
+                                <div class="media">
+                                    <div class="media-content">
+                                        <!-- <p class="title is-4">John Smith</p> -->
+                                        <p class="subtitle is-6 has-text-grey">#{{ item.id }} {{ item.name }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="content">
+                                    <!-- <a :href="item.url" target="_blank">Click Here</a> -->
+                                    <p class="tag" v-for="tag of splitTags(item.tags)"> {{ tag }}</p>
+                                    <br>
+                                    <label class="has-text-primary has-background-primary-light" v-if="item.match"
+                                        style="font-weight: bold;"> {{ item.match}}% </label>
+                                    <!-- <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example !
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            <tr v-if="items.length === 0">
+                                <td class="has-text-centered" colspan="4">
+                                    No se han encontrado registros ...
+                                </td>
+                            </tr>
+                            <tr v-for="item in items" :class="item.enabled ? '' : 'has-text-grey-light'">
+                                <td> {{ item.id }} </td>
+                                <td> {{ item.name }} </td>
+                                <td>
+                                    <a :href="item.url" target="_blank">Click Here</a>
+                                </td>
+                                <td>
+                                    <img :src="item.photo" style="width: 50%; height: 50%">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table> -->
+
+                    <div class="columns">
+                        <div class="card column">
+                            <div class="card-content">
+                                <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                                    <a class="pagination-previous" v-on:click="previous()">Previous</a>
+                                    <a class="pagination-next" v-on:click="next()">Next page</a>
+                                    <ul class="pagination-list">
+                                        <li v-for='gt of pagination.goToPages'>
+                                            <a class="pagination-link" aria-label="Goto page 1"
+                                                :class="{ 'is-current': gt.isCurrent }" v-on:click="goToPage(gt.page)">
+                                                {{ gt.page }}
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                    <!-- <div class="select">
+                                        <select [(ngModel)]="pagination.pageSize" (change)="changePageSize()">
+                                            <option *ngFor='let option of showItems' [value]='option.value'>{{option.text}}</option>
+                                        </select>
+                                    </div> -->
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal New Video -->
+        <div class="modal" id="modal-js-new-video">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title is-size-6 has-text-weight-semibold">Video</p>
+                    <button class="delete" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <form v-on:submit.prevent="saveItem">
+
+                        <div class="field is-horizontal">
+                            <!-- <div class="field-label"></div> -->
+                            <div class="field-body">
+                                <div class="field is-expanded">
+                                    <div class="field has-addons">
+                                        <p class="control">
+                                            <a class="button is-static is-small">
+                                                URL
+                                            </a>
+                                        </p>
+                                        <p class="control is-expanded">
+                                            <input class="input is-small" type="text" placeholder="Enter URL" v-model="newItem.url" required>
+                                        </p>
+                                    </div>
+                                    <!-- <p class="help">Do not enter the first zero</p> -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field is-horizontal">
+                            
+                            <div class="field-body">
+                                <div class="field is-expanded">
+                                    <div class="field has-addons">
+                                        <p class="control">
+                                            <a class="button is-small" v-on:click="getNameFromNewItemUrl()" style="background-color: #f5f5f5;">
+                                                Name
+                                            </a>
+                                        </p>
+                                        <p class="control is-expanded">
+                                            <input class="input is-small" type="text" placeholder="Enter name" v-model="newItem.name" required>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field is-expanded">
+                                    <div class="field has-addons">
+                                        <p class="control">
+                                            <a class="button is-static is-small">
+                                                Photo
+                                            </a>
+                                        </p>
+                                        <p class="control is-expanded">
+                                            <input class="input is-small" type="text" placeholder="Enter Lkink Photo" v-model="newItem.photo" required>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="card-image" style="width: 75%;">
+                            <figure class="image is-4by3">
+                                <a target="_blank">
+                                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image" v-if="!newItem.photo">
+                                    <img :src="newItem.photo" v-else>
+                                </a>
+                            </figure>
+                        </div>
+    
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                            </div>
+                        </div>
+    
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field is-expanded">
+                                    <div class="field has-addons">
+                                        <p class="control">
+                                            <a class="button is-static is-small">
+                                                Model
+                                            </a>
+                                        </p>
+                                        <p class="control is-expanded">
+                                            <input class="input is-small" type="text" placeholder="Enter model" v-model="newItem.model">
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="field is-expanded">
+                                    <div class="field has-addons">
+                                        <p class="control">
+                                            <a class="button is-static is-small">
+                                                Rate
+                                            </a>
+                                        </p>
+                                        <p class="control is-expanded" style="border: 1px solid #dbdbdb;">
+                                            <label class="radio ml-5">
+                                                <input type="radio" name="rate" v-model="newItem.rate" value="1"> 1
+                                            </label>
+                                            <label class="radio">
+                                                <input type="radio" name="rate" v-model="newItem.rate" value="2"> 2
+                                            </label>
+                                            <label class="radio">
+                                                <input type="radio" name="rate" v-model="newItem.rate" value="3" checked> 3
+                                            </label>
+                                            <label class="radio">
+                                                <input type="radio" name="rate" v-model="newItem.rate" value="4"> 4
+                                            </label>
+                                            <label class="radio">
+                                                <input type="radio" name="rate" v-model="newItem.rate" value="5"> 5
+                                            </label>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="field is-horizontal">
+                            <!-- <div class="field-label"></div> -->
+                            <div class="field-body">
+                                <div class="field is-expanded">
+                                    <div class="field has-addons">
+                                        <p class="control">
+                                            <a class="button is-static is-small">
+                                                Tags
+                                            </a>
+                                        </p>
+                                        <p class="control is-expanded">
+                                            <textarea class="textarea is-small" placeholder="Enter tags" rows="2" v-model="newItem.tags"></textarea>
+                                        </p>
+                                    </div>
+                                    <p class="help">Separe tags by comma. Example: funny,education,cook</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- <hr />
+                            <pre>
+                                {{ newItem }}
+                            </pre> -->
+                        <hr />
+                        <div class="field is-grouped is-grouped-centered">
+                            <p class="control">
+                              <button class="button is-primary is-small">
+                                Submit
+                              </button>
+                              <!-- <button class="button is-small" aria-label="close">Close</button> -->
+                            </p>
+                          </div>
+
+                    </form>
+                </section>
+                <!-- <footer class="modal-card-foot">
+                    <button class="button is-primary">Save</button>
+                    <button class="button">Close</button>
+                </footer> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+    <script src="./js/lib/vue.min.js"></script>
+    <script src="./js/lib/vue-open-modal.js"></script>
+    <script src="./js/index.js"></script>
+</body>
+</html>

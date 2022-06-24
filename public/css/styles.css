@@ -1,0 +1,25 @@
+.section {
+    padding: 0% !important;
+}
+
+.tag {
+    background-color: #918787 !important;
+    border-radius: 6px;
+    margin: 0px;
+    padding: 2px;
+    font-size: 0.75rem;
+    margin-right: 2px;
+    color: #f2ebeb !important;
+}
+
+.card-content {
+    padding: 0.50rem !important;
+}
+
+.media {
+    margin-bottom: 1rem !important;
+}
+
+.shadow {
+    box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%), 0 0 0 1px rgb(10 10 10 / 2%);
+}
