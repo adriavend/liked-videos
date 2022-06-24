@@ -68,7 +68,9 @@ const app = new Vue({
         },
 
         getItemsByCurrentPage() {
-            fetch('/videos/page/'+this.pagination.currentPage+'?tags='+this.selectedTags.join(',')).then(res => res.json()).then(data => {
+            fetch('/videos/page/'+this.pagination.currentPage+'?tags='+this.selectedTags.join(','))
+            .then(res => res.json())
+            .then(data => {
                 // console.log(data);
                 this.items = data;
             });
@@ -80,7 +82,9 @@ const app = new Vue({
         },
 
         _getAllTags() {
-            fetch('/videos/tags/').then(res => res.json()).then(data => {
+            fetch('/videos/tags/')
+            .then(res => res.json())
+            .then(data => {
                 this.allTags = data;
             });
         },
@@ -130,7 +134,46 @@ const app = new Vue({
                     this.getItemsByCurrentPage();
                 }
             });
+        },
+
+        updateItemRate(item, newRate) {
+            if (item.rate){
+                item["rate"] = newRate;
+            }
+            else {
+                item.rate = newRate;
+            }
+            console.log(item);
+            this.$forceUpdate();
+            this._updateItem(item.id, { rate: newRate});
+        },
+
+        showVideoOnModal(item) {
+            this.newItem.id = item.id;
+            this.newItem.name = item.name;
+            this.newItem.url = item.url;
+            this.newItem.photo = item.photo;
+            this.newItem.tags = item.tags;
+            this.newItem.rate = item.rate;
+            this.newItem.model = item.model;
+
+            document.getElementById("modal-js-video").classList.add("is-active");
+        },
+
+        _updateItem(id, objPropsValues) {
+            fetch('videos/'+id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(objPropsValues),
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+            });
         }
+        
     },
     created: async function () {
         //this.pagination.total = itemsDb.length;

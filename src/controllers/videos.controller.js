@@ -94,11 +94,21 @@ export const createVideo = async (req, res) => {
 
 export const updateVideo = async (req, res) => {
     const db = getConnection();
-    const videoFound = videos.find(x => x.id == req.params.id);
+    const videoFound = db.data.videos.find(x => x.id == req.params.id);
     if (!videoFound) return res.sendStatus(404);
 
-    videoFound.name = req.body.name;
-    videoFound.description = req.body.description;
+    const propsValues = req.body;
+    for (var [key, value] of Object.entries(propsValues)) {
+        videoFound[key] = value;
+    }
+
+    // videoFound.name = req.body.name;
+    // videoFound.url = req.body.url;
+    // videoFound.photo = req.body.photo;
+    // videoFound.tags = req.body.tags;
+    // videoFound.rate = req.body.rate;
+    // videoFound.model = req.body.model;
+    videoFound.modifiedAt = new Date();
 
     db.data.videos.map(t => t.id == req.params.id ? videoFound : t);
 

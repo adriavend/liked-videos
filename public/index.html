@@ -5,6 +5,7 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>VueJS</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="./css/styles.css">
 </head>
@@ -32,7 +33,7 @@
                 <div class="navbar-end">
                     <div class="navbar-item">
                         <div class="buttons">
-                            <button class="button is-info js-modal-trigger" data-target="modal-js-new-video">
+                            <button class="button is-info js-modal-trigger" data-target="modal-js-video">
                                 <strong>New</strong>
                             </button>
                             <!-- <a class="button is-primary">
@@ -94,7 +95,6 @@
                             <div class="card-content">
                                 <div class="media">
                                     <div class="media-content">
-                                        <!-- <p class="title is-4">John Smith</p> -->
                                         <p class="subtitle is-6 has-text-grey">#{{ item.id }} {{ item.name }}</p>
                                     </div>
                                 </div>
@@ -103,6 +103,15 @@
                                     <!-- <a :href="item.url" target="_blank">Click Here</a> -->
                                     <p class="tag" v-for="tag of splitTags(item.tags)"> {{ tag }}</p>
                                     <br>
+                                    <span class="icon" v-for="rate of 5">
+                                        <i class="fa fa-star cursor-pointer" :class="{ 'color-gold': rate <= item.rate  }" v-on:click="updateItemRate(item, rate)"></i>
+                                    </span>
+                                    <span class="icon is-pulled-right">
+                                        <i class="fa fa-trash cursor-pointer"></i>
+                                    </span>
+                                    <span class="icon is-pulled-right">
+                                        <i class="fa fa-pencil cursor-pointer" v-on:click="showVideoOnModal(item)"></i>
+                                    </span>
                                     <label class="has-text-primary has-background-primary-light" v-if="item.match"
                                         style="font-weight: bold;"> {{ item.match}}% </label>
                                     <!-- <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time> -->
@@ -162,7 +171,7 @@
         </section>
 
         <!-- Modal New Video -->
-        <div class="modal" id="modal-js-new-video">
+        <div class="modal" id="modal-js-video">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
