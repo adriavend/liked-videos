@@ -10,7 +10,7 @@ const app = new Vue({
         },
         allTags: [],
         selectedTags: [],
-        newItem: {
+        videoVM: {
             id: 0,
             name: '',
             url: '',
@@ -105,35 +105,50 @@ const app = new Vue({
         },
 
         getNameFromNewItemUrl() {
-            if (!this.newItem.url) return '';
-            let str = this.newItem.url.split('/').slice(-1)[0];
-            this.newItem.name = str.replaceAll('_', ' ').split(' ').map(word => word.replace(/\w/, c => c.toUpperCase())).join(' ');
+            if (!this.videoVM.url) return '';
+            let str = this.videoVM.url.split('/').slice(-1)[0];
+            this.videoVM.name = str.replaceAll('_', ' ').split(' ').map(word => word.replace(/\w/, c => c.toUpperCase())).join(' ');
         },
 
         saveItem() {
-            this.newItem.rate = parseInt(this.newItem.rate);
+            this.videoVM.rate = parseInt(this.videoVM.rate);
+            if (this.videoVM.id == 0) {
+                this._createItem(this.videoVM);
+            }
+            else {
+                this._updateItem(this.videoVM.id, this.videoVM);
+                this._resetFormItem();
+                this._hideFormModal();
+            }
+        },
+
+        _createItem(item) {
             fetch('videos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(this.newItem),
+                body: JSON.stringify(item),
             })
             .then(res => res.json())
             .then(data => {
                 if (data.id != 0) {
-                    this.newItem = {
-                        id: 0,
-                        name: '',
-                        url: '',
-                        photo: '',
-                        tags: '',
-                        rate: 3,
-                        model: ''
-                    };
+                    this._resetFormItem();
                     this.getItemsByCurrentPage();
                 }
             });
+        },
+
+        _resetFormItem() {
+            this.videoVM = {
+                id: 0,
+                name: '',
+                url: '',
+                photo: '',
+                tags: '',
+                rate: 3,
+                model: ''
+            };
         },
 
         updateItemRate(item, newRate) {
@@ -145,19 +160,19 @@ const app = new Vue({
             }
             console.log(item);
             this.$forceUpdate();
-            this._updateItem(item.id, { rate: newRate});
+            this._updateItem(item.id, { rate: newRate });
         },
 
         showVideoOnModal(item) {
-            this.newItem.id = item.id;
-            this.newItem.name = item.name;
-            this.newItem.url = item.url;
-            this.newItem.photo = item.photo;
-            this.newItem.tags = item.tags;
-            this.newItem.rate = item.rate;
-            this.newItem.model = item.model;
+            this.videoVM.id = item.id;
+            this.videoVM.name = item.name;
+            this.videoVM.url = item.url;
+            this.videoVM.photo = item.photo;
+            this.videoVM.tags = item.tags;
+            this.videoVM.rate = item.rate;
+            this.videoVM.model = item.model;
 
-            document.getElementById("modal-js-video").classList.add("is-active");
+            this._showFormModal();
         },
 
         _updateItem(id, objPropsValues) {
@@ -171,9 +186,35 @@ const app = new Vue({
             .then(res => res.json())
             .then(data => {
                 console.log(data);
+                this.getItemsByCurrentPage();
             });
+        },
+
+        removeVideo(item) {
+            const result = confirm('Ara you sure do you want delete Video?');
+            if (result) {
+                this._deleteItem(item.id);
+            }
+        },
+
+        _deleteItem(id) {
+            fetch('videos/'+id, {
+                method: 'DELETE',
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                this.getItemsByCurrentPage();
+            });
+        },
+
+        _showFormModal() {
+            document.getElementById("modal-js-video").classList.add("is-active");
+        },
+
+        _hideFormModal() {
+            document.getElementById("modal-js-video").classList.remove('is-active');
         }
-        
     },
     created: async function () {
         //this.pagination.total = itemsDb.length;

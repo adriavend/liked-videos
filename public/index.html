@@ -87,8 +87,8 @@
                                 <figure class="image is-4by3">
                                     <a :href="item.url" target="_blank">
                                         <img src="https://bulma.io/images/placeholders/1280x960.png"
-                                            alt="Placeholder image" v-if="!item.photo || 1 == 1">
-                                        <!-- <img :src="item.photo" v-if="item.photo"> -->
+                                            alt="Placeholder image" v-if="!item.photo">
+                                        <img :src="item.photo" v-if="item.photo">
                                     </a>
                                 </figure>
                             </div>
@@ -106,7 +106,7 @@
                                     <span class="icon" v-for="rate of 5">
                                         <i class="fa fa-star cursor-pointer" :class="{ 'color-gold': rate <= item.rate  }" v-on:click="updateItemRate(item, rate)"></i>
                                     </span>
-                                    <span class="icon is-pulled-right">
+                                    <span class="icon is-pulled-right" v-on:click="removeVideo(item)">
                                         <i class="fa fa-trash cursor-pointer"></i>
                                     </span>
                                     <span class="icon is-pulled-right">
@@ -181,6 +181,7 @@
                 <section class="modal-card-body">
                     <form v-on:submit.prevent="saveItem">
 
+                        <input type="hidden" v-model="videoVM.id" />
                         <div class="field is-horizontal">
                             <!-- <div class="field-label"></div> -->
                             <div class="field-body">
@@ -192,7 +193,7 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter URL" v-model="newItem.url" required>
+                                            <input class="input is-small" type="text" placeholder="Enter URL" v-model="videoVM.url" required>
                                         </p>
                                     </div>
                                     <!-- <p class="help">Do not enter the first zero</p> -->
@@ -211,7 +212,7 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter name" v-model="newItem.name" required>
+                                            <input class="input is-small" type="text" placeholder="Enter name" v-model="videoVM.name" required>
                                         </p>
                                     </div>
                                 </div>
@@ -228,7 +229,7 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter Lkink Photo" v-model="newItem.photo" required>
+                                            <input class="input is-small" type="text" placeholder="Enter Lkink Photo" v-model="videoVM.photo" required>
                                         </p>
                                     </div>
                                 </div>
@@ -238,8 +239,8 @@
                         <div class="card-image" style="width: 75%;">
                             <figure class="image is-4by3">
                                 <a target="_blank">
-                                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image" v-if="!newItem.photo">
-                                    <img :src="newItem.photo" v-else>
+                                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image" v-if="!videoVM.photo">
+                                    <img :src="videoVM.photo" v-else>
                                 </a>
                             </figure>
                         </div>
@@ -259,7 +260,7 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter model" v-model="newItem.model">
+                                            <input class="input is-small" type="text" placeholder="Enter model" v-model="videoVM.model">
                                         </p>
                                     </div>
                                 </div>
@@ -272,19 +273,19 @@
                                         </p>
                                         <p class="control is-expanded" style="border: 1px solid #dbdbdb;">
                                             <label class="radio ml-5">
-                                                <input type="radio" name="rate" v-model="newItem.rate" value="1"> 1
+                                                <input type="radio" name="rate" v-model="videoVM.rate" value="1"> 1
                                             </label>
                                             <label class="radio">
-                                                <input type="radio" name="rate" v-model="newItem.rate" value="2"> 2
+                                                <input type="radio" name="rate" v-model="videoVM.rate" value="2"> 2
                                             </label>
                                             <label class="radio">
-                                                <input type="radio" name="rate" v-model="newItem.rate" value="3" checked> 3
+                                                <input type="radio" name="rate" v-model="videoVM.rate" value="3" checked> 3
                                             </label>
                                             <label class="radio">
-                                                <input type="radio" name="rate" v-model="newItem.rate" value="4"> 4
+                                                <input type="radio" name="rate" v-model="videoVM.rate" value="4"> 4
                                             </label>
                                             <label class="radio">
-                                                <input type="radio" name="rate" v-model="newItem.rate" value="5"> 5
+                                                <input type="radio" name="rate" v-model="videoVM.rate" value="5"> 5
                                             </label>
                                         </p>
                                     </div>
@@ -303,7 +304,7 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <textarea class="textarea is-small" placeholder="Enter tags" rows="2" v-model="newItem.tags"></textarea>
+                                            <textarea class="textarea is-small" placeholder="Enter tags" rows="2" v-model="videoVM.tags"></textarea>
                                         </p>
                                     </div>
                                     <p class="help">Separe tags by comma. Example: funny,education,cook</p>
@@ -313,7 +314,7 @@
 
                         <!-- <hr />
                             <pre>
-                                {{ newItem }}
+                                {{ videoVM }}
                             </pre> -->
                         <hr />
                         <div class="field is-grouped is-grouped-centered">
