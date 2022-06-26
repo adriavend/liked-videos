@@ -135,7 +135,12 @@ const app = new Vue({
                 if (data.id != 0) {
                     this._resetFormItem();
                     this.getItemsByCurrentPage();
+                    toastr.success('Create new Item Sucessfully');
                 }
+            })
+            .catch(function(error) {
+                console.error('There was a problem with the Fetch request: ', error.message);
+                toastr.error(error.message);
             });
         },
 
@@ -152,10 +157,13 @@ const app = new Vue({
         },
 
         updateItemRate(item, newRate) {
-            if (item.rate){
+            if (!item.rate){
                 item["rate"] = newRate;
             }
             else {
+                if (item.rate == newRate){
+                    return false;
+                }
                 item.rate = newRate;
             }
             console.log(item);
@@ -187,6 +195,11 @@ const app = new Vue({
             .then(data => {
                 console.log(data);
                 this.getItemsByCurrentPage();
+                toastr.info('Update Success');
+            })
+            .catch(function(error) {
+                console.error('There was a problem with the Fetch request: ', error.message);
+                toastr.error(error.message);
             });
         },
 
@@ -205,6 +218,11 @@ const app = new Vue({
             .then(data => {
                 console.log(data);
                 this.getItemsByCurrentPage();
+                toastr.warning("Delete item Sucessfully");
+            })
+            .catch(function(error) {
+                console.error('There was a problem with the Fetch request: ', error.message);
+                toastr.error(error.message);
             });
         },
 
