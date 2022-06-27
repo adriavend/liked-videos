@@ -232,6 +232,10 @@ const app = new Vue({
 
         _hideFormModal() {
             document.getElementById("modal-js-video").classList.remove('is-active');
+        },
+
+        IsTagSelected(tag) {
+            return this.selectedTags.some(x => x == tag);
         }
     },
     created: async function () {

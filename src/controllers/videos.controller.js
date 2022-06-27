@@ -61,7 +61,19 @@ export const getVideosTags = (req, res) => {
     b = b.filter((v, i, a) => a.indexOf(v) == i); // remove duplicates
 
     let allTags = b.filter(x => x.length > 0).sort();
-    res.json(allTags);
+
+    // group by Letter
+    let letters = allTags.map(x => x[0].toUpperCase()).filter((v, i, a) => a.indexOf(v) === i);
+
+    let results = [];
+    for (let letter of letters) {
+        results.push({
+            letter: letter,
+            items: allTags.filter(x => x[0].toLowerCase() == letter.toLowerCase())
+        });
+    }
+
+    res.json(results);
 }
 
 export const getVideo = (req, res) => {

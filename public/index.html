@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
@@ -8,8 +9,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-accordion@2.0.1/dist/css/bulma-accordion.min.css">
     <link rel="stylesheet" href="./css/styles.css">
 </head>
+
 <body>
     <section id="app" class="section">
 
@@ -34,7 +37,7 @@
                 <div class="navbar-end">
                     <div class="navbar-item">
                         <div class="buttons">
-                            <button class="button is-info js-modal-trigger" data-target="modal-js-video">
+                            <button class="button is-info js-modal-trigger" data-target="modal-js-video" v-on:click="_resetFormItem()">
                                 <strong>New</strong>
                             </button>
                             <!-- <a class="button is-primary">
@@ -47,56 +50,72 @@
                     </div>
                 </div>
             </div>
-        </nav>      
+        </nav>
 
         <!-- Items Section -->
         <section class="hero is-light is-bold is-fullheight mt-5">
             <div class="hero-body">
                 <div class="container">
-                    <!-- <h1 class="title">
-                        Videos
-                    </h1>
-                    <h2 class="subtitle">
-                        Items
-                    </h2> -->
+                    <!-- <h1 class="title"> Videos </h1>
+                    <h2 class="subtitle"> Items </h2> -->
 
                     <!-- Filters -->
-                    <div class="columns">
-                        <div class="card">
-                            <div class="card-content">
-                                <div class="columns">
-                                    <div class="column is-11">
-                                        <label class="checkbox" v-for="tg of allTags" style="margin-right: 7px;">
-                                            <input type="checkbox" :value="tg" v-model="selectedTags">
-                                            {{ tg }}
-                                            <br>
-                                        </label>
-                                    </div>
-                                    <div class="column">
-                                        <button class="button is-primary" v-on:click="getItemsByCurrentPage()">Filter</button>
-                                        <button class="button is-info is-light is-small mt-2" v-on:click="cleanTags()"
-                                            style="width: 78%;">Clean</button>
+                    <section class="accordions mb-5">
+                        <article class="accordion is-active">
+                            <div class="accordion-header toggle">
+                                <p>Filters</p>
+                            </div>
+                            <div class="accordion-body">
+                                <div class="accordion-content">
+
+                                    <div class="card ">
+                                        <div class="card-content">
+                                            <div class="columns">
+                                                <div class="column is-11">
+                                                    <span v-for="group of allTags">
+                                                        <label class="has-text-weight-medium mr-1"
+                                                            style="background-color: black; color: white;">
+                                                            {{ group.letter }}
+                                                        </label>
+                                                        <label class="checkbox" v-for="tg of group.items"
+                                                            style="margin-right: 7px;"
+                                                            :class="{ 'checkbox-tag': IsTagSelected(tg) }">
+                                                            <input type="checkbox" :value="tg" v-model="selectedTags">
+                                                            {{ tg }}
+                                                            <br>
+                                                        </label>
+                                                        <!-- <br> -->
+                                                    </span>
+                                                </div>
+                                                <div class="column">
+                                                    <button class="button is-primary"
+                                                        v-on:click="getItemsByCurrentPage()">Filter</button>
+                                                    <button class="button is-info is-light is-small mt-2"
+                                                        v-on:click="cleanTags()" style="width: 78%;">Clean</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </article>
+                    </section>
 
                     <div class="columns is-multiline">
                         <div class="card column is-3" v-for="item in items" style="width: 24% !important; margin: 5px;">
-                            <div class="card-image">
+                            <div class="card-image" style="margin: -12px -12px 0px -12px">
                                 <figure class="image is-4by3">
                                     <a :href="item.url" target="_blank">
                                         <img src="https://bulma.io/images/placeholders/1280x960.png"
-                                            alt="Placeholder image" v-if="!item.photo || true">
-                                        <!-- <img :src="item.photo" v-if="item.photo"> -->
+                                            alt="Placeholder image" v-if="!item.photo">
+                                        <img :src="item.photo" v-if="item.photo">
                                     </a>
                                 </figure>
                             </div>
                             <div class="card-content">
                                 <div class="media">
                                     <div class="media-content">
-                                        <p class="subtitle is-6 has-text-grey">#{{ item.id }} {{ item.name }}</p>
+                                        <p class="subtitle is-7 has-text-grey">#{{ item.id }} {{ item.name }}</p>
                                     </div>
                                 </div>
 
@@ -105,7 +124,9 @@
                                     <p class="tag" v-for="tag of splitTags(item.tags)"> {{ tag }}</p>
                                     <br>
                                     <span class="icon" v-for="rate of 5">
-                                        <i class="fa fa-star cursor-pointer" :class="{ 'color-gold': rate <= item.rate  }" v-on:click="updateItemRate(item, rate)"></i>
+                                        <i class="fa fa-star cursor-pointer"
+                                            :class="{ 'color-gold': rate <= item.rate  }"
+                                            v-on:click="updateItemRate(item, rate)"></i>
                                     </span>
                                     <span class="icon is-pulled-right" v-on:click="removeVideo(item)">
                                         <i class="fa fa-trash cursor-pointer"></i>
@@ -194,7 +215,8 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter URL" v-model="videoVM.url" required>
+                                            <input class="input is-small" type="text" placeholder="Enter URL"
+                                                v-model="videoVM.url" required>
                                         </p>
                                     </div>
                                     <!-- <p class="help">Do not enter the first zero</p> -->
@@ -203,23 +225,25 @@
                         </div>
 
                         <div class="field is-horizontal">
-                            
+
                             <div class="field-body">
                                 <div class="field is-expanded">
                                     <div class="field has-addons">
                                         <p class="control">
-                                            <a class="button is-small" v-on:click="getNameFromNewItemUrl()" style="background-color: #f5f5f5;">
+                                            <a class="button is-small" v-on:click="getNameFromNewItemUrl()"
+                                                style="background-color: #f5f5f5;">
                                                 Name
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter name" v-model="videoVM.name" required>
+                                            <input class="input is-small" type="text" placeholder="Enter name"
+                                                v-model="videoVM.name" required>
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                                
+
                         <div class="field is-horizontal">
                             <div class="field-body">
                                 <div class="field is-expanded">
@@ -230,27 +254,29 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter Lkink Photo" v-model="videoVM.photo" required>
+                                            <input class="input is-small" type="text" placeholder="Enter Lkink Photo"
+                                                v-model="videoVM.photo" required>
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-    
+
                         <div class="card-image" style="width: 75%;">
                             <figure class="image is-4by3">
                                 <a target="_blank">
-                                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image" v-if="!videoVM.photo">
+                                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image"
+                                        v-if="!videoVM.photo">
                                     <img :src="videoVM.photo" v-else>
                                 </a>
                             </figure>
                         </div>
-    
+
                         <div class="field is-horizontal">
                             <div class="field-body">
                             </div>
                         </div>
-    
+
                         <div class="field is-horizontal">
                             <div class="field-body">
                                 <div class="field is-expanded">
@@ -261,7 +287,8 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <input class="input is-small" type="text" placeholder="Enter model" v-model="videoVM.model">
+                                            <input class="input is-small" type="text" placeholder="Enter model"
+                                                v-model="videoVM.model">
                                         </p>
                                     </div>
                                 </div>
@@ -280,7 +307,8 @@
                                                 <input type="radio" name="rate" v-model="videoVM.rate" value="2"> 2
                                             </label>
                                             <label class="radio">
-                                                <input type="radio" name="rate" v-model="videoVM.rate" value="3" checked> 3
+                                                <input type="radio" name="rate" v-model="videoVM.rate" value="3"
+                                                    checked> 3
                                             </label>
                                             <label class="radio">
                                                 <input type="radio" name="rate" v-model="videoVM.rate" value="4"> 4
@@ -293,7 +321,7 @@
                                 </div>
                             </div>
                         </div>
-    
+
                         <div class="field is-horizontal">
                             <!-- <div class="field-label"></div> -->
                             <div class="field-body">
@@ -305,7 +333,8 @@
                                             </a>
                                         </p>
                                         <p class="control is-expanded">
-                                            <textarea class="textarea is-small" placeholder="Enter tags" rows="2" v-model="videoVM.tags"></textarea>
+                                            <textarea class="textarea is-small" placeholder="Enter tags" rows="2"
+                                                v-model="videoVM.tags"></textarea>
                                         </p>
                                     </div>
                                     <p class="help">Separe tags by comma. Example: funny,education,cook</p>
@@ -320,12 +349,12 @@
                         <hr />
                         <div class="field is-grouped is-grouped-centered">
                             <p class="control">
-                              <button class="button is-primary is-small">
-                                Submit
-                              </button>
-                              <!-- <button class="button is-small" aria-label="close">Close</button> -->
+                                <button class="button is-primary is-small">
+                                    Submit
+                                </button>
+                                <!-- <button class="button is-small" aria-label="close">Close</button> -->
                             </p>
-                          </div>
+                        </div>
 
                     </form>
                 </section>
@@ -335,6 +364,7 @@
                 </footer> -->
             </div>
         </div>
+
     </section>
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
@@ -342,6 +372,11 @@
     <script src="./js/lib/vue-open-modal.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bulma-accordion@2.0.1/dist/js/bulma-accordion.min.js"></script>
     <script src="./js/index.js"></script>
+    <script>
+        var accordions = bulmaAccordion.attach();
+    </script>
 </body>
+
 </html>
